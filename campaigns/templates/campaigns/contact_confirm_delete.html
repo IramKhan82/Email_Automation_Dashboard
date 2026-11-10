@@ -1,0 +1,104 @@
+{% extends "campaigns/base.html" %}
+
+{% block content %}
+
+<style>
+
+.topbar h1 {
+    display: none;
+}
+
+.delete-container {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.delete-card {
+    width: 100%;
+    max-width: 470px;
+    padding: 28px;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 3px 12px lightgray;
+    transition: 0.2s;
+}
+.delete-card:hover {
+    box-shadow: 0 6px 16px silver;
+}
+.warning-icon {
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: mistyrose;
+    color: firebrick;
+    font-size: 27px;
+    font-weight: bold;
+}
+.delete-card h2 {
+    color: midnightblue;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+.delete-card p {
+    color: slategray;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.contact-name {
+    color: midnightblue;
+    font-weight: 700;
+}
+.warning-text {
+    color: firebrick !important;
+    margin-top: 12px;
+}
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+}
+.delete-button {
+    background: firebrick;
+    border-color: firebrick;
+}
+.delete-button:hover {
+    background: darkred;
+    border-color: darkred;
+}
+.cancel-button {
+    background: slategray;
+    border-color: slategray;
+}
+@media(max-width: 500px) {
+    .delete-card { padding: 22px 17px; }
+    .delete-actions { flex-direction: column; }
+}
+</style>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="warning-icon">!</div>
+        <h2>Delete Contact?</h2>
+        <p>Are you sure you want to delete <span class="contact-name">{{ contact.name }}</span>?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="button delete-button">Yes, Delete</button>
+                <a href="{% url 'contact_list' %}" class="button cancel-button">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

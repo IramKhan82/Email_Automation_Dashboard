@@ -1,0 +1,121 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}Send Campaign{% endblock %}
+
+{% block content %}
+
+<style>
+.send-container {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.send-card {
+    width: 100%;
+    max-width: 550px;
+    padding: 28px;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 3px 12px lightgray;
+}
+.send-icon {
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: aliceblue;
+    color: royalblue;
+    font-size: 26px;
+}
+.send-card h2 {
+    color: midnightblue;
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+.send-description {
+    color: slategray;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+.campaign-details {
+    padding: 18px;
+    background: aliceblue;
+    border: 1px solid lightblue;
+    border-radius: 9px;
+    text-align: left;
+    margin: 20px 0;
+}
+.campaign-details p {
+    color: slategray;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+.campaign-details h3 {
+    color: midnightblue;
+    font-size: 19px;
+    margin-bottom: 10px;
+}
+.review-text {
+    color: firebrick;
+    font-size: 13px;
+    margin: 18px 0;
+}
+.send-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+.send-button {
+    background: royalblue;
+    border-color: royalblue;
+}
+.send-button:hover {
+    background: midnightblue;
+    border-color: midnightblue;
+}
+.cancel-button {
+    background: slategray;
+    border-color: slategray;
+}
+@media(max-width: 500px) {
+    .send-card { padding: 22px 17px; }
+    .send-actions { flex-direction: column; }
+}
+</style>
+
+<div class="send-container">
+    <div class="send-card">
+        <div class="send-icon">✉</div>
+
+        <h2>Confirm Campaign</h2>
+        <p class="send-description">You are about to send the following email campaign.</p>
+
+        <div class="campaign-details">
+            <p>Campaign Name</p>
+            <h3>{{ campaign.name }}</h3>
+            <p>Subject</p>
+            <h3>{{ campaign.subject }}</h3>
+        </div>
+
+        <p class="review-text">Please review your campaign details before sending.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="send-actions">
+                <button type="submit" class="button send-button">Send Emails</button>
+                <a href="{% url 'campaign_list' %}" class="button cancel-button">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

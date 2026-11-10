@@ -1,0 +1,183 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Email Logs
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .logs-card {
+        padding: 25px;
+        background: white;
+        border: 1px solid lightgray;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .logs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .logs-heading h2 {
+        color: midnightblue;
+        font-size: 20px;
+        margin-bottom: 7px;
+    }
+
+    .logs-heading p {
+        color: slategray;
+        font-size: 13px;
+    }
+
+    .clear-button {
+        background: firebrick;
+        color: white;
+        border: 1px solid firebrick;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .clear-button:hover {
+        background: darkred;
+        transform: translateY(-2px);
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 5px 11px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-sent {
+        background: honeydew;
+        color: seagreen;
+        border: 1px solid lightgreen;
+    }
+
+    .status-failed {
+        background: mistyrose;
+        color: firebrick;
+        border: 1px solid lightcoral;
+    }
+
+    .status-pending {
+        background: lightyellow;
+        color: darkgoldenrod;
+        border: 1px solid khaki;
+    }
+
+    .error-text {
+        color: firebrick;
+        max-width: 250px;
+        overflow-wrap: anywhere;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: slategray;
+        padding: 25px;
+    }
+
+    @media (max-width: 600px) {
+        .logs-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="card logs-card">
+
+    <div class="logs-header">
+
+        <div class="logs-heading">
+            <h2>Email Activity</h2>
+            <p>Track sent emails, delivery status, recipients and errors.</p>
+        </div>
+
+        {% if logs %}
+        <form method="POST"
+              action="{% url 'clear_all_logs' %}"
+              onsubmit="return confirm('Are you sure you want to delete ALL email logs? This action cannot be undone.');">
+            {% csrf_token %}
+
+            <button type="submit" class="clear-button">
+                Clear All Logs
+            </button>
+        </form>
+        {% endif %}
+
+    </div>
+
+    <div class="table-wrapper">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Email Source</th>
+                    <th>Recipient Email</th>
+                    <th>Status</th>
+                    <th>Sent Date</th>
+                    <th>Error Message</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>
+                        {% if log.campaign %}
+                            {{ log.campaign.name }}
+                        {% else %}
+                            Workflow Email
+                        {% endif %}
+                    </td>
+
+                    <td>{{ log.recipient_email }}</td>
+
+                    <td>
+                        {% if log.status == "sent" %}
+                            <span class="status-badge status-sent">Sent</span>
+                        {% elif log.status == "failed" %}
+                            <span class="status-badge status-failed">Failed</span>
+                        {% else %}
+                            <span class="status-badge status-pending">{{ log.status|title }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ log.sent_at|date:"M d, Y H:i"|default:"-" }}</td>
+
+                    <td class="error-text">{{ log.error_message|default:"-" }}</td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No email logs available yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

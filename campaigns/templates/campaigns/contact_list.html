@@ -1,0 +1,290 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}Contact Management{% endblock %}
+
+{% block content %}
+
+<style>
+.contact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.contact-header p, .import-card p {
+    color: slategray;
+    font-size: 13px;
+}
+
+.import-card {
+    margin-bottom: 22px;
+}
+
+.import-card h3 {
+    color: midnightblue;
+    margin-top: 0;
+}
+
+.contact-table {
+    min-width: 550px;
+}
+
+.contact-table td, .contact-table th {
+    padding: 14px;
+}
+
+.contact-table tbody tr:hover {
+    background: ghostwhite;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.contact-actions a {
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.contact-actions a:first-child {
+    color: royalblue;
+}
+
+.contact-actions a:last-child {
+    color: firebrick;
+}
+
+.contact-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.active-status {
+    background: honeydew;
+    color: seagreen;
+}
+
+.inactive-status {
+    background: mistyrose;
+    color: firebrick;
+}
+
+.contact-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: royalblue;
+}
+
+.bulk-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.bulk-delete-button {
+    background: firebrick;
+    border-color: firebrick;
+}
+
+.bulk-delete-button:hover {
+    background: darkred;
+    border-color: darkred;
+}
+
+.bulk-delete-button:disabled {
+    background: silver;
+    border-color: silver;
+    cursor: not-allowed;
+}
+
+.selected-count {
+    color: slategray;
+    font-size: 13px;
+}
+</style>
+
+<div class="contact-page">
+
+    <div class="contact-header">
+        <div>
+            <h2 style="color: midnightblue;">Contacts</h2>
+            <p>Manage your contacts and import them using a CSV file.</p>
+        </div>
+
+        <a href="{% url 'contact_create' %}" class="button">
+            + Add New Contact
+        </a>
+    </div>
+
+    <div class="card import-card">
+        <h3>Import Contacts from CSV</h3>
+
+        <p>Upload a CSV file containing the required contact details.</p>
+
+        <form method="POST" action="{% url 'import_contacts' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="file" name="csv_file" accept=".csv" required>
+
+            <button type="submit" class="button">
+                Import Contacts
+            </button>
+        </form>
+
+        <p>CSV file must contain: <strong>name, email</strong></p>
+    </div>
+
+    <div class="card">
+
+        <h3 style="color: midnightblue; margin-top: 0;">All Contacts</h3>
+
+        <form method="POST" action="{% url 'contact_bulk_delete' %}" id="bulkDeleteForm">
+
+            {% csrf_token %}
+
+            <div class="bulk-actions">
+
+                <span class="selected-count" id="selectedCount">
+                    0 contacts selected
+                </span>
+
+                <button type="submit" class="button bulk-delete-button" id="bulkDeleteButton" disabled>
+                    Delete Selected
+                </button>
+
+            </div>
+
+            <div style="overflow-x: auto;">
+
+                <table class="contact-table">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" class="contact-checkbox">
+                            </th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for contact in contacts %}
+
+                        <tr>
+
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    name="selected_contacts"
+                                    value="{{ contact.pk }}"
+                                    class="contact-checkbox contact-select">
+                            </td>
+
+                            <td>{{ contact.name }}</td>
+
+                            <td>{{ contact.email }}</td>
+
+                            <td>
+                                {% if contact.is_active %}
+                                    <span class="contact-status active-status">Active</span>
+                                {% else %}
+                                    <span class="contact-status inactive-status">Inactive</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="contact-actions">
+                                    <a href="{% url 'contact_edit' contact.pk %}">Edit</a>
+                                    <a href="{% url 'contact_delete' contact.pk %}">Delete</a>
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: slategray;">
+                                No contacts found.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+const selectAll = document.getElementById("selectAll");
+const contactCheckboxes = document.querySelectorAll(".contact-select");
+const deleteButton = document.getElementById("bulkDeleteButton");
+const selectedCount = document.getElementById("selectedCount");
+
+function updateSelection() {
+
+    const checked = document.querySelectorAll(".contact-select:checked").length;
+
+    selectedCount.textContent = checked + " contacts selected";
+
+    deleteButton.disabled = checked === 0;
+
+    selectAll.checked = contactCheckboxes.length > 0 && checked === contactCheckboxes.length;
+
+    selectAll.indeterminate = checked > 0 && checked < contactCheckboxes.length;
+}
+
+selectAll.addEventListener("change", function() {
+
+    contactCheckboxes.forEach(function(checkbox) {
+        checkbox.checked = selectAll.checked;
+    });
+
+    updateSelection();
+});
+
+contactCheckboxes.forEach(function(checkbox) {
+
+    checkbox.addEventListener("change", updateSelection);
+
+});
+
+document.getElementById("bulkDeleteForm").addEventListener("submit", function(event) {
+
+    const checked = document.querySelectorAll(".contact-select:checked").length;
+
+    if (checked === 0) {
+        event.preventDefault();
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete " + checked + " selected contacts?")) {
+        event.preventDefault();
+    }
+
+});
+</script>
+
+{% endblock %}

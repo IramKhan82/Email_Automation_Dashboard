@@ -1,0 +1,76 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Contact Groups
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; gap: 12px; flex-wrap: wrap; }
+    .group-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-bottom: 22px; }
+    .group-summary .card { padding: 20px; }
+    .group-summary h3 { color: slategray; font-size: 13px; margin-bottom: 10px; }
+    .group-summary p { color: midnightblue; font-size: 26px; font-weight: 700; }
+    .group-table-card { padding: 22px; }
+    .group-table-card h2 { color: midnightblue; font-size: 18px; margin-bottom: 16px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+    .action-link { display: inline-block; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; }
+    .edit-link { color: royalblue; background: aliceblue; }
+    .edit-link:hover { background: lightblue; }
+    .delete-link { color: firebrick; background: mistyrose; }
+    .delete-link:hover { background: lightcoral; color: white; }
+    .empty-message { text-align: center; color: slategray; padding: 25px; }
+</style>
+
+<div class="group-header">
+    <div>
+        <h2 style="color: midnightblue; font-size: 19px;">Manage Contact Groups</h2>
+        <p style="color: slategray; font-size: 13px;">Organize your contacts into groups.</p>
+    </div>
+    <a href="{% url 'group_create' %}" class="button">+ Create New Group</a>
+</div>
+
+<div class="group-summary">
+    <div class="card">
+        <h3>Total Groups</h3>
+        <p>{{ groups|length }}</p>
+    </div>
+    <div class="card">
+        <h3>Contact Management</h3>
+        <p style="font-size: 16px;">Organized</p>
+    </div>
+</div>
+
+<div class="card group-table-card">
+    <h2>All Contact Groups</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Group Name</th>
+                    <th>Total Contacts</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group in groups %}
+                <tr>
+                    <td><strong>{{ group.name }}</strong></td>
+                    <td>{{ group.contacts.count }}</td>
+                    <td>
+                        <a href="{% url 'group_edit' group.pk %}" class="action-link edit-link">Edit</a>
+                        <a href="{% url 'group_delete' group.pk %}" class="action-link delete-link">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="empty-message">No groups created yet. Create your first group!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

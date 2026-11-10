@@ -1,0 +1,41 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .topbar h1 {
+    display: none;
+    }
+    .form-card {
+    width: 100%;
+    max-width: none;
+    min-height: calc(100vh - 60px);
+    padding: 35px;
+    }
+    .form-heading { color: midnightblue; font-size: 19px; margin-bottom: 8px; }
+    .form-description { color: slategray; font-size: 13px; margin-bottom: 22px; }
+    .form-actions { display: flex; gap: 12px; align-items: center; margin-top: 15px; }
+    .cancel-button { background: white; color: slategray; border: 1px solid silver; }
+    .cancel-button:hover { background: whitesmoke; color: midnightblue; border-color: slategray; }
+</style>
+
+<div class="card form-card">
+    <h2 class="form-heading">{{ title }}</h2>
+    <p class="form-description">Create or update your reusable email template.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="form-actions">
+            <button class="button" type="submit">Save Template</button>
+            <a href="{% url 'template_list' %}" class="button cancel-button">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

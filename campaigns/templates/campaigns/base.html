@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EmailFlow{% endblock %}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        
+        .messages-container {
+        margin-bottom: 20px;
+        }
+
+        .alert-message {
+        padding: 14px 18px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid;
+        }
+
+        .alert-message.success {
+        background: honeydew;
+        color: darkgreen;
+        border-color: lightgreen;
+        }
+
+        .alert-message.warning {
+        background: cornsilk;
+        color: darkgoldenrod;
+        border-color: gold;
+        }
+
+        .alert-message.error {
+        background: mistyrose;
+        color: darkred;
+        border-color: lightcoral;   
+        }
+
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: whitesmoke;
+            color: darkslategray;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* FIXED SIDEBAR */
+        .sidebar {
+            width: 245px;
+            min-width: 245px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: midnightblue;
+            color: white;
+            padding: 25px 18px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .logo span {
+            color: lightskyblue;
+        }
+
+        .sidebar a {
+            display: block;
+            color: lightgray;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: darkslateblue;
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .sidebar a.active {
+            background: royalblue;
+            color: white;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            min-width: 0;
+            margin-left: 245px;
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            font-size: 25px;
+            color: midnightblue;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 18px;
+            margin: 22px 0;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border: 1px solid lightgray;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px lightgray;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px silver;
+        }
+
+        .card h3 {
+            color: slategray;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: 700;
+            color: midnightblue;
+        }
+
+        .button {
+            display: inline-block;
+            background: royalblue;
+            color: white;
+            padding: 11px 18px;
+            border: 1px solid royalblue;
+            border-radius: 7px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .button:hover {
+            background: midnightblue;
+            border-color: midnightblue;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border: 1px solid lightgray;
+            border-radius: 10px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid gainsboro;
+            font-size: 14px;
+        }
+
+        th {
+            color: slategray;
+            font-weight: 600;
+            background: aliceblue;
+        }
+
+        td {
+            color: darkslategray;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: ghostwhite;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 11px 13px;
+            margin: 8px 0 18px;
+            border: 1px solid silver;
+            border-radius: 7px;
+            background: white;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: royalblue;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: darkslateblue;
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 200px;
+                min-width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                padding: 22px 18px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-width: 100%;
+                height: auto;
+                padding: 15px;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .sidebar a {
+                display: inline-block;
+                margin: 3px;
+                padding: 9px;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 18px 14px;
+            }
+
+            .topbar h1 {
+                font-size: 21px;
+            }
+            .logout-form {
+             margin: 20px 12px;
+            }
+
+            .logout-btn {
+            width: 100%;
+            padding: 12px 15px;
+            background: transparent;
+            color: white;
+            border: 1px solid #475569;
+            border-radius: 7px;
+            text-align: left;
+            font-size: 15px;
+            cursor: pointer;
+            }
+
+            .logout-btn:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">✉ Email<span>Flow</span></div>
+
+        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">◈ Dashboard</a>
+
+        <a href="{% url 'campaign_list' %}" class="{% if 'campaign' in request.resolver_match.url_name %}active{% endif %}">✉ Campaigns</a>
+
+        <a href="{% url 'contact_list' %}" class="{% if 'contact' in request.resolver_match.url_name %}active{% endif %}">♙ Contacts</a>
+
+        <a href="{% url 'group_list' %}" class="{% if 'group' in request.resolver_match.url_name %}active{% endif %}">◫ Contact Groups</a>
+
+        <a href="{% url 'template_list' %}" class="{% if 'template' in request.resolver_match.url_name %}active{% endif %}">▤ Templates</a>
+
+        <a href="{% url 'email_logs' %}" class="{% if 'email_logs' in request.resolver_match.url_name %}active{% endif %}">▧ Email Logs</a>
+
+        <a href="{% url 'workflow_list' %}" class="{% if 'workflow' in request.resolver_match.url_name %}active{% endif %}">⚙ Workflows</a>
+
+        <form method="POST" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+             <button type="submit" class="logout-btn">
+                ↪ Logout
+            </button>
+        </form>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="topbar">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        </div>
+    
+    {% if messages %}
+        <div class="messages-container">
+          {% for message in messages %}
+                <div class="alert-message {{ message.tags }}">
+                     {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+</div>
+
+</body>
+</html>

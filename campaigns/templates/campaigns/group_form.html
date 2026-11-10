@@ -1,0 +1,149 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<style>
+.group-form {
+    width: 100%;
+}
+.form-section {
+    width: 100%;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 8px lightgray;
+    transition: 0.2s;
+}
+.form-section:hover {
+    box-shadow: 0 5px 14px silver;
+}
+.section-heading {
+    color: midnightblue;
+    font-size: 19px;
+    margin: 0 0 8px;
+}
+.section-description {
+    color: slategray;
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+.form-field {
+    margin-bottom: 20px;
+}
+.form-field > label {
+    display: block;
+    color: darkslateblue;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 9px;
+}
+.form-field input:not([type="checkbox"]) {
+    width: 100%;
+    padding: 12px;
+    margin: 0;
+    border: 1px solid silver;
+    border-radius: 7px;
+    font-size: 14px;
+}
+.form-field input:focus {
+    outline: none;
+    border-color: royalblue;
+}
+.choice-list > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+}
+.choice-list > div > div {
+    padding: 12px;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    background: whitesmoke;
+    transition: 0.2s;
+}
+.choice-list > div > div:hover {
+    background: aliceblue;
+    border-color: royalblue;
+}
+.choice-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: darkslategray;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.choice-list input[type="checkbox"] {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    accent-color: royalblue;
+    cursor: pointer;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+.cancel-button {
+    background: slategray;
+    border-color: slategray;
+}
+.cancel-button:hover {
+    background: midnightblue;
+    border-color: midnightblue;
+}
+@media(max-width: 600px) {
+    .form-section {
+        padding: 18px;
+    }
+    .choice-list > div {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="group-form">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <h2 class="section-heading">Group Details</h2>
+            <p class="section-description">Enter a name for your contact group.</p>
+
+            <div class="form-field">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="section-heading">Select Contacts</h2>
+            <p class="section-description">Choose the contacts you want to add to this group.</p>
+
+            <div class="form-field">
+                <label>{{ form.contacts.label }}</label>
+                <div class="choice-list">
+                    {{ form.contacts }}
+                </div>
+                {{ form.contacts.errors }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="button">Save Group</button>
+            <a href="{% url 'group_list' %}" class="button cancel-button">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

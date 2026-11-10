@@ -1,0 +1,278 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Create Email Campaign
+{% endblock %}
+
+{% block content %}
+
+<style>
+.campaign-form {
+    width: 100%;
+    max-width: none;
+}
+
+.form-section {
+    width: 100%;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 7px lightgray;
+    transition: 0.2s;
+}
+
+.form-section:hover {
+    box-shadow: 0 5px 14px silver;
+}
+
+.section-heading {
+    color: midnightblue;
+    font-size: 19px;
+    margin: 0 0 8px;
+}
+
+.section-description {
+    color: slategray;
+    font-size: 13px;
+    margin-bottom: 24px;
+}
+
+.form-field {
+    margin-bottom: 25px;
+}
+
+.form-field:last-child {
+    margin-bottom: 0;
+}
+
+.form-field > label {
+    display: block;
+    margin-bottom: 10px;
+    color: darkslateblue;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-field input:not([type="checkbox"]),
+.form-field textarea,
+.form-field select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid silver;
+    border-radius: 7px;
+    background: white;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+    outline: none;
+    border-color: royalblue;
+}
+
+.form-field textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-field input[type="datetime-local"] {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 10px;
+    padding: 12px;
+}
+
+.choice-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.choice-list div {
+    padding: 12px;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    background: whitesmoke;
+    transition: 0.2s;
+}
+
+.choice-list div:hover {
+    background: aliceblue;
+    border-color: royalblue;
+}
+
+.choice-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: darkslategray;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.choice-list input[type="checkbox"] {
+    width: auto;
+    min-width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    accent-color: royalblue;
+    cursor: pointer;
+}
+
+.form-error {
+    color: firebrick;
+    font-size: 13px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 28px;
+    margin-bottom: 25px;
+}
+
+.cancel-button {
+    background: slategray;
+    border-color: slategray;
+}
+
+.cancel-button:hover {
+    background: midnightblue;
+    border-color: midnightblue;
+}
+
+@media(max-width: 600px) {
+    .form-section {
+        padding: 17px;
+    }
+
+    .choice-list {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+<div class="campaign-form">
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="form-section">
+        <h2 class="section-heading">Campaign Details</h2>
+        <p class="section-description">Enter the basic information for your email campaign.</p>
+
+        <div class="form-field">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+
+        <div class="form-field">
+            {{ form.subject.label_tag }}
+            {{ form.subject }}
+            {{ form.subject.errors }}
+        </div>
+
+        <div class="form-field">
+            {{ form.body.label_tag }}
+            {{ form.body }}
+            {{ form.body.errors }}
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2 class="section-heading">Email Template</h2>
+        <p class="section-description">Select a saved template to automatically fill your subject and message.</p>
+
+        <div class="form-field">
+            {{ form.template.label_tag }}
+            {{ form.template }}
+            {{ form.template.errors }}
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2 class="section-heading">Individual Recipients</h2>
+        <p class="section-description">Select individual contacts who should receive this campaign.</p>
+
+        <div class="form-field">
+            <label>{{ form.recipients.label }}</label>
+            <div class="choice-list">
+                {{ form.recipients }}
+            </div>
+            {{ form.recipients.errors }}
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2 class="section-heading">Contact Groups</h2>
+        <p class="section-description">Select groups to send this campaign to multiple contacts together.</p>
+
+        <div class="form-field">
+            <label>{{ form.groups.label }}</label>
+            <div class="choice-list">
+                {{ form.groups }}
+            </div>
+            {{ form.groups.errors }}
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2 class="section-heading">Schedule Campaign</h2>
+        <p class="section-description">Choose the date and time when you want your campaign to be sent.</p>
+
+        <div class="form-field">
+            {{ form.scheduled_at.label_tag }}
+            {{ form.scheduled_at }}
+            {{ form.scheduled_at.errors }}
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button class="button" type="submit">Save Campaign</button>
+        <a class="button cancel-button" href="{% url 'campaign_list' %}">Cancel</a>
+    </div>
+
+</form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const templateSelect = document.getElementById("id_template");
+    const subjectField = document.getElementById("id_subject");
+    const bodyField = document.getElementById("id_body");
+
+    if (!templateSelect) return;
+
+    templateSelect.addEventListener("change", function () {
+        const templateId = this.value;
+
+        if (!templateId) return;
+
+        const urlTemplate = "{% url 'get_template_details' 0 %}";
+        const url = urlTemplate.replace("/0/", `/${templateId}/`);
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                subjectField.value = data.subject;
+                bodyField.value = data.body;
+            })
+            .catch(error => console.error("Error:", error));
+    });
+});
+</script>
+
+{% endblock %}

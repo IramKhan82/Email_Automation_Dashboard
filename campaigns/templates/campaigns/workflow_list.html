@@ -1,0 +1,111 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Workflows
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .workflow-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+    .workflow-header h2 { color: midnightblue; font-size: 19px; margin-bottom: 6px; }
+    .workflow-header p { color: slategray; font-size: 13px; }
+    .workflow-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-bottom: 22px; }
+    .workflow-summary .card { padding: 20px; }
+    .workflow-summary h3 { color: slategray; font-size: 13px; margin-bottom: 10px; }
+    .workflow-summary p { color: midnightblue; font-size: 26px; font-weight: 700; }
+    .workflow-table-card { padding: 22px; }
+    .workflow-table-card h2 { color: midnightblue; font-size: 18px; margin-bottom: 16px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+    .status-badge { display: inline-block; padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .active-badge { background: honeydew; color: seagreen; border: 1px solid lightgreen; }
+    .inactive-badge { background: mistyrose; color: firebrick; border: 1px solid lightcoral; }
+    .action-link { display: inline-block; padding: 7px 11px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; transition: 0.2s; border: 1px solid transparent; }
+    .edit-link { color: royalblue; background: aliceblue; }
+    .edit-link:hover { background: lightblue; }
+    .delete-link { color: firebrick; background: mistyrose; }
+    .delete-link:hover { background: lightcoral; color: white; }
+    .toggle-button { padding: 7px 11px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .activate-button { background: honeydew; color: seagreen; border: 1px solid lightgreen; }
+    .activate-button:hover { background: seagreen; color: white; }
+    .deactivate-button { background: lightyellow; color: darkgoldenrod; border: 1px solid khaki; }
+    .deactivate-button:hover { background: darkgoldenrod; color: white; }
+    .action-group { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .empty-message { text-align: center; color: slategray; padding: 25px; }
+</style>
+
+<div class="workflow-header">
+    <div>
+        <h2>Manage Your Workflows</h2>
+        <p>Automate emails using predefined triggers and templates.</p>
+    </div>
+    <a href="{% url 'workflow_create' %}" class="button">+ Create Workflow</a>
+</div>
+
+<div class="workflow-summary">
+    <div class="card">
+        <h3>Total Workflows</h3>
+        <p>{{ workflows|length }}</p>
+    </div>
+    <div class="card">
+        <h3>Automation Management</h3>
+        <p style="font-size: 16px;">Automated</p>
+    </div>
+</div>
+
+<div class="card workflow-table-card">
+    <h2>All Workflows</h2>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Trigger</th>
+                    <th>Email Template</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for workflow in workflows %}
+                <tr>
+                    <td><strong>{{ workflow.name }}</strong></td>
+                    <td>{{ workflow.get_trigger_display }}</td>
+                    <td>{{ workflow.template.name }}</td>
+                    <td>
+                        {% if workflow.is_active %}
+                            <span class="status-badge active-badge">Active</span>
+                        {% else %}
+                            <span class="status-badge inactive-badge">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-group">
+                            <a href="{% url 'workflow_edit' workflow.pk %}" class="action-link edit-link">Edit</a>
+
+                            <form method="POST" action="{% url 'workflow_toggle' workflow.pk %}">
+                                {% csrf_token %}
+                                {% if workflow.is_active %}
+                                    <button type="submit" class="toggle-button deactivate-button">Deactivate</button>
+                                {% else %}
+                                    <button type="submit" class="toggle-button activate-button">Activate</button>
+                                {% endif %}
+                            </form>
+
+                            <a href="{% url 'workflow_delete' workflow.pk %}" class="action-link delete-link">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-message">No workflows created yet. Create your first workflow!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

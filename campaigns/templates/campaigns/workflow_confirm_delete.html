@@ -1,0 +1,141 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Delete Workflow
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .delete-container {
+        min-height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 25px;
+    }
+
+    .delete-card {
+        width: 100%;
+        max-width: 550px;
+        padding: 35px;
+        background: white;
+        border: 1px solid lightgray;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .delete-icon {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: mistyrose;
+        border-radius: 50%;
+        font-size: 30px;
+    }
+
+    .delete-card h2 {
+        color: midnightblue;
+        font-size: 23px;
+        margin-bottom: 12px;
+    }
+
+    .delete-card p {
+        color: slategray;
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 28px;
+    }
+
+    .delete-card strong {
+        color: midnightblue;
+    }
+
+    .delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .delete-button {
+        background: firebrick;
+        color: white;
+        border: 1px solid firebrick;
+        padding: 11px 23px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .delete-button:hover {
+        background: darkred;
+        border-color: darkred;
+        transform: translateY(-2px);
+    }
+
+    .cancel-button {
+        background: white;
+        color: slategray;
+        border: 1px solid silver;
+        padding: 11px 23px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .cancel-button:hover {
+        background: whitesmoke;
+        color: midnightblue;
+        border-color: slategray;
+    }
+
+    @media (max-width: 500px) {
+        .delete-card {
+            padding: 25px 18px;
+        }
+
+        .delete-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="delete-container">
+
+    <div class="card delete-card">
+
+        <div class="delete-icon">⚠️</div>
+
+        <h2>Delete Workflow?</h2>
+
+        <p>
+            Are you sure you want to delete
+            <strong>{{ workflow.name }}</strong>?
+            This action cannot be undone.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="delete-actions">
+                <button type="submit" class="delete-button">
+                    Yes, Delete
+                </button>
+
+                <a href="{% url 'workflow_list' %}" class="cancel-button">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

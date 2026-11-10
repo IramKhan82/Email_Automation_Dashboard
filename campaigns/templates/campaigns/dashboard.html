@@ -1,0 +1,304 @@
+{% extends "campaigns/base.html" %}
+{% block page_title %}Email Automation Dashboard{% endblock %}
+{% block content %}
+<style>
+.dashboard { color: darkslategray; }
+.dashboard-header, .panel-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+.dashboard-header { margin-bottom: 25px; }
+.dashboard-header h2 { color: midnightblue; font-size: 23px; }
+.dashboard-header p, .panel-subtitle { color: slategray; font-size: 13px; margin-top: 6px; }
+.create-btn { background: royalblue; color: white; padding: 11px 18px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; }
+.create-btn:hover { background: midnightblue; transform: translateY(-2px); }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 17px; margin-bottom: 22px; }
+.metric-card, .dashboard-panel { background: white; border: 1px solid lightgray; border-radius: 12px; padding: 21px; box-shadow: 0 2px 8px lightgray; transition: 0.2s; }
+.metric-card:hover, .dashboard-panel:hover { transform: translateY(-3px); box-shadow: 0 6px 15px silver; }
+.metric-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 17px; }
+.metric-icon { width: 39px; height: 39px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 19px; }
+.icon-blue { background: aliceblue; color: royalblue; }
+.icon-green { background: honeydew; color: seagreen; }
+.icon-orange { background: oldlace; color: darkorange; }
+.icon-red { background: mistyrose; color: firebrick; }
+.metric-label { font-size: 13px; color: slategray; }
+.metric-value { font-size: 27px; font-weight: 700; color: midnightblue; }
+.main-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; margin-bottom: 22px; }
+.bottom-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 22px; }
+.panel-heading { margin-bottom: 20px; }
+.panel-heading h3 { color: midnightblue; font-size: 15px; }
+.panel-subtitle { font-size: 12px; }
+.chart-container { height: 290px; position: relative; }
+.status-badge { display: inline-block; padding: 6px 11px; border-radius: 20px; background: aliceblue; color: royalblue; font-size: 11px; }
+.automation-number { font-size: 30px; font-weight: 700; color: royalblue; margin: 8px 0; }
+.automation-item { padding: 16px 0; border-bottom: 1px solid gainsboro; }
+.automation-item:last-child { border-bottom: none; }
+.automation-info { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.automation-info h4 { font-size: 13px; color: midnightblue; }
+.automation-info span, .automation-description { font-size: 12px; color: slategray; }
+.automation-description { margin-top: 7px; font-size: 11px; }
+.table-wrapper { overflow-x: auto; }
+.dashboard-table { width: 100%; border-collapse: collapse; }
+.dashboard-table th, .dashboard-table td { text-align: left; padding: 13px 10px; border-bottom: 1px solid gainsboro; font-size: 12px; }
+.dashboard-table th { color: slategray; background: aliceblue; font-size: 11px; }
+.dashboard-table td { color: darkslategray; }
+.dashboard-table tbody tr:hover { background: ghostwhite; }
+.dashboard-table tr:last-child td { border-bottom: none; }
+.campaign-name { color: midnightblue !important; font-weight: 600; }
+.activity-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid gainsboro; }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: aliceblue; color: seagreen; flex-shrink: 0; }
+.activity-details { min-width: 0; }
+.activity-details h4 { font-size: 12px; color: midnightblue; }
+.activity-details p { font-size: 11px; color: slategray; margin-top: 5px; word-break: break-word; }
+.activity-time { font-size: 10px; color: gray; margin-top: 5px; }
+.empty-message { text-align: center; padding: 25px; color: slategray; font-size: 12px; }
+@media(max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width: 850px) {
+    .main-grid, .bottom-grid { grid-template-columns: 1fr; }
+}
+@media(max-width: 500px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .dashboard-panel { padding: 16px; }
+    .dashboard-table { min-width: 450px; }
+}
+</style>
+<div class="dashboard">
+    <div class="dashboard-header">
+        <div>
+            <h2>Good morning! 👋</h2>
+            <p>Have a quick glance at your emails dashboard.</p>
+        </div>
+        <a href="{% url 'campaign_create' %}" class="create-btn">+ New Campaign</a>
+    </div>
+    <div class="stats-grid">
+        <div class="metric-card">
+            <div class="metric-top">
+                <span class="metric-label">Total Campaigns</span>
+                <div class="metric-icon icon-blue">✉</div>
+            </div>
+            <div class="metric-value" id="totalCampaigns">{{ total_campaigns }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-top">
+                <span class="metric-label">Active Contacts</span>
+                <div class="metric-icon icon-green">♙</div>
+            </div>
+            <div class="metric-value" id="totalContacts">{{ total_contacts }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-top">
+                <span class="metric-label">Emails Sent</span>
+                <div class="metric-icon icon-blue">↗</div>
+            </div>
+            <div class="metric-value" id="sentEmails">{{ sent_emails }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-top">
+                <span class="metric-label">Failed Emails</span>
+                <div class="metric-icon icon-red">!</div>
+            </div>
+            <div class="metric-value" id="failedEmails">{{ failed_emails }}</div>
+        </div>
+    </div>
+    <div class="main-grid">
+        <div class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Campaign Performance</h3>
+                    <p class="panel-subtitle">Email delivery activity over the last 7 days</p>
+                </div>
+                <span class="status-badge">Last 7 Days</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Top Automations</h3>
+                    <p class="panel-subtitle">Your automation overview</p>
+                </div>
+            </div>
+            <div class="automation-item">
+                <div class="automation-info">
+                    <h4>Active Workflows</h4>
+                    <span>● Active</span>
+                </div>
+                <div class="automation-number" id="activeWorkflows">{{ active_workflows }}</div>
+                <p class="automation-description">Currently enabled workflows</p>
+            </div>
+            <div class="automation-item">
+                <div class="automation-info">
+                    <h4>Scheduled Campaigns</h4>
+                    <span>◷ Scheduled</span>
+                </div>
+                <div class="automation-number" id="scheduledCampaigns">{{ scheduled_campaigns }}</div>
+                <p class="automation-description">Campaigns waiting to be sent</p>
+            </div>
+            <div class="automation-item">
+                <div class="automation-info">
+                    <h4>Total Workflows</h4>
+                    <span>Automation</span>
+                </div>
+                <div class="automation-number">{{ total_workflows }}</div>
+                <p class="automation-description">Total workflows created</p>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-grid">
+        <div class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Recent Campaigns</h3>
+                    <p class="panel-subtitle">Your latest email campaigns</p>
+                </div>
+                <a href="{% url 'campaign_list' %}" style="font-size: 12px; color: royalblue; text-decoration: none;">View All →</a>
+            </div>
+            <div class="table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>CAMPAIGN</th>
+                            <th>SUBJECT</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in recent_campaigns %}
+                        <tr>
+                            <td class="campaign-name">{{ campaign.name }}</td>
+                            <td>{{ campaign.subject }}</td>
+                            <td><span class="status-badge">{{ campaign.get_status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="empty-message">No campaigns created yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Recent Activity</h3>
+                    <p class="panel-subtitle">Latest email activity</p>
+                </div>
+            </div>
+            <div id="recentActivities">
+                <div class="empty-message">Loading activities...</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const chartCanvas = document.getElementById("performanceChart");
+const performanceChart = new Chart(chartCanvas, {
+    type: "line",
+    data: {
+        labels: [],
+        datasets: [
+            {
+                label: "Emails Sent",
+                data: [],
+                borderColor: "royalblue",
+                backgroundColor: "aliceblue",
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 3
+            },
+            {
+                label: "Failed Emails",
+                data: [],
+                borderColor: "salmon",
+                backgroundColor: "mistyrose",
+                fill: false,
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 3
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: "index" },
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: { usePointStyle: true, padding: 20 }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 },
+                grid: { color: "gainsboro" }
+            },
+            x: { grid: { display: false } }
+        }
+    }
+});
+async function updateDashboard() {
+    try {
+        const response = await fetch("{% url 'dashboard_live_data' %}");
+        if (!response.ok) throw new Error("Dashboard API error");
+        const data = await response.json();
+        const stats = data.stats;
+        document.getElementById("totalCampaigns").textContent = stats.total_campaigns;
+        document.getElementById("totalContacts").textContent = stats.total_contacts;
+        document.getElementById("sentEmails").textContent = stats.sent_emails;
+        document.getElementById("failedEmails").textContent = stats.failed_emails;
+        document.getElementById("scheduledCampaigns").textContent = stats.scheduled_campaigns;
+        document.getElementById("activeWorkflows").textContent = stats.active_workflows;
+        performanceChart.data.labels = data.chart.labels;
+        performanceChart.data.datasets[0].data = data.chart.sent;
+        performanceChart.data.datasets[1].data = data.chart.failed;
+        performanceChart.update();
+        const activityContainer = document.getElementById("recentActivities");
+        if (data.activities.length === 0) {
+            activityContainer.innerHTML = '<div class="empty-message">No recent activity yet.</div>';
+        } else {
+            activityContainer.innerHTML = data.activities.map(activity => {
+                const icon = activity.status === "sent" ? "✓" : "!";
+                const color = activity.status === "sent" ? "seagreen" : "firebrick";
+                const safeSource = escapeHTML(activity.source);
+                const safeRecipient = escapeHTML(activity.recipient);
+                const safeTime = escapeHTML(activity.time);
+                const safeStatus = escapeHTML(activity.status);
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon" style="color:${color}">${icon}</div>
+                        <div class="activity-details">
+                            <h4>${safeSource}</h4>
+                            <p>${safeRecipient}</p>
+                            <div class="activity-time">${safeStatus} · ${safeTime}</div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+    } catch (error) {
+        console.error("Dashboard update failed:", error);
+    }
+}
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function(character) {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+        return entities[character];
+    });
+}
+updateDashboard();
+setInterval(updateDashboard, 15000);
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "campaigns/base.html" %}
+
+{% block content %}
+
+<style>
+
+.topbar h1 {
+    display: none;
+}
+
+
+.delete-container {
+    min-height: 75vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+.delete-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 3px 12px lightgray;
+    transition: 0.2s;
+}
+.delete-card:hover {
+    box-shadow: 0 6px 16px silver;
+}
+.warning-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: mistyrose;
+    color: firebrick;
+    font-size: 28px;
+    font-weight: bold;
+}
+.delete-card h2 {
+    color: midnightblue;
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+.delete-card p {
+    color: slategray;
+    font-size: 15px;
+    line-height: 1.6;
+}
+.campaign-name {
+    color: midnightblue;
+    font-weight: 700;
+}
+.warning-text {
+    color: firebrick !important;
+    font-size: 13px !important;
+    margin-top: 12px;
+}
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+}
+.delete-button {
+    background: firebrick;
+    border-color: firebrick;
+}
+.delete-button:hover {
+    background: darkred;
+    border-color: darkred;
+}
+.cancel-button {
+    background: white;
+    color: slategray;
+    border: 1px solid silver;
+}
+.cancel-button:hover {
+    background: whitesmoke;
+    color: midnightblue;
+}
+@media(max-width: 600px) {
+    .delete-card { padding: 22px 17px; }
+    .delete-actions { flex-direction: column; }
+    .delete-actions .button { width: 100%; text-align: center; }
+}
+</style>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="warning-icon">!</div>
+        <h2>Delete Campaign?</h2>
+        <p>Are you sure you want to delete <span class="campaign-name">{{ campaign.name }}</span>?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="button delete-button">Yes, Delete</button>
+                <a href="{% url 'campaign_list' %}" class="button cancel-button">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

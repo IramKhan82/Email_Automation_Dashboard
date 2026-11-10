@@ -1,0 +1,112 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<style>
+.contact-form-card {
+    width: 100%;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 3px 10px lightgray;
+}
+.contact-form-card h2 {
+    color: midnightblue;
+    font-size: 21px;
+    margin: 0 0 8px;
+}
+.form-description {
+    color: slategray;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+.contact-field {
+    margin-bottom: 18px;
+}
+.contact-field label {
+    display: block;
+    color: darkslateblue;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+.contact-field input:not([type="checkbox"]) {
+    width: 100%;
+    padding: 11px 13px;
+    margin: 0;
+    border: 1px solid silver;
+    border-radius: 7px;
+    font-size: 14px;
+}
+.contact-field input:focus {
+    outline: none;
+    border-color: royalblue;
+}
+.active-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+.active-field label {
+    margin: 0;
+    color: darkslateblue;
+    font-size: 14px;
+    font-weight: 600;
+}
+.active-field input {
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    accent-color: royalblue;
+}
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+.cancel-button {
+    background: slategray;
+    border-color: slategray;
+}
+@media(max-width: 600px) {
+    .contact-form-card { padding: 18px; }
+}
+</style>
+
+<div class="contact-form-card">
+    <h2>{{ title }}</h2>
+    <p class="form-description">Enter the contact details below.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="contact-field">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+
+        <div class="contact-field">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+
+        <div class="active-field">
+            {{ form.is_active }}
+            {{ form.is_active.label_tag }}
+        </div>
+        {{ form.is_active.errors }}
+
+        <div class="form-actions">
+            <button type="submit" class="button">Save Contact</button>
+            <a href="{% url 'contact_list' %}" class="button cancel-button">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

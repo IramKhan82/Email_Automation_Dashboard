@@ -1,0 +1,80 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Email Templates
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .template-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+    .template-header h2 { color: midnightblue; font-size: 19px; margin-bottom: 6px; }
+    .template-header p { color: slategray; font-size: 13px; }
+    .template-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-bottom: 22px; }
+    .template-summary .card { padding: 20px; }
+    .template-summary h3 { color: slategray; font-size: 13px; margin-bottom: 10px; }
+    .template-summary p { color: midnightblue; font-size: 26px; font-weight: 700; }
+    .template-table-card { padding: 22px; }
+    .template-table-card h2 { color: midnightblue; font-size: 18px; margin-bottom: 16px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+    .action-link { display: inline-block; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; }
+    .edit-link { color: royalblue; background: aliceblue; }
+    .edit-link:hover { background: lightblue; }
+    .delete-link { color: firebrick; background: mistyrose; }
+    .delete-link:hover { background: lightcoral; color: white; }
+    .empty-message { text-align: center; color: slategray; padding: 25px; }
+</style>
+
+<div class="template-header">
+    <div>
+        <h2>Manage Email Templates</h2>
+        <p>Create and manage reusable email content for your campaigns.</p>
+    </div>
+    <a class="button" href="{% url 'template_create' %}">+ Create Template</a>
+</div>
+
+<div class="template-summary">
+    <div class="card">
+        <h3>Total Templates</h3>
+        <p>{{ templates|length }}</p>
+    </div>
+    <div class="card">
+        <h3>Template Management</h3>
+        <p style="font-size: 16px;">Organized</p>
+    </div>
+</div>
+
+<div class="card template-table-card">
+    <h2>All Email Templates</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Subject</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for template in templates %}
+                <tr>
+                    <td><strong>{{ template.name }}</strong></td>
+                    <td>{{ template.subject }}</td>
+                    <td>{{ template.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'template_edit' template.pk %}" class="action-link edit-link">Edit</a>
+                        <a href="{% url 'template_delete' template.pk %}" class="action-link delete-link">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-message">No email templates available. Create your first template!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

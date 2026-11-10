@@ -1,0 +1,185 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}
+Create Workflow
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .topbar h1 {
+        display: none;
+    }
+
+    .workflow-container {
+        width: 100%;
+        padding: 15px 20px;
+        box-sizing: border-box;
+    }
+
+    .workflow-card {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 35px;
+        background: white;
+        border: 1px solid lightgray;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+        box-sizing: border-box;
+    }
+
+    .form-heading {
+        color: midnightblue;
+        font-size: 23px;
+        margin-bottom: 8px;
+    }
+
+    .form-description {
+        color: slategray;
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .workflow-field {
+        margin-bottom: 28px;
+    }
+
+    .workflow-field label {
+        display: block;
+        color: midnightblue;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .workflow-field input:not([type="checkbox"]),
+    .workflow-field select,
+    .workflow-field textarea {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid silver;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .workflow-field input:focus,
+    .workflow-field select:focus,
+    .workflow-field textarea:focus {
+        outline: none;
+        border-color: royalblue;
+        box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.12);
+    }
+
+    /* Is Active checkbox alignment */
+    .workflow-field:has(input[type="checkbox"]) {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 5px;
+    }
+
+    .workflow-field:has(input[type="checkbox"]) label {
+        display: inline-block;
+        margin: 0;
+    }
+
+    .workflow-field input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: royalblue;
+        cursor: pointer;
+    }
+
+    .workflow-field .helptext {
+        display: block;
+        color: slategray;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .workflow-field .errorlist {
+        color: firebrick;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+    }
+
+    .save-button {
+        padding: 13px 26px;
+        background: royalblue;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .save-button:hover {
+        background: mediumblue;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    @media (max-width: 600px) {
+        .workflow-container {
+            padding: 10px;
+        }
+
+        .workflow-card {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="workflow-container">
+
+    <div class="card workflow-card">
+
+        <h2 class="form-heading">Create New Workflow</h2>
+
+        <p class="form-description">
+            Configure an automated email workflow for your contacts.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="workflow-field">
+
+                {{ field.label_tag }}
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small class="helptext">{{ field.help_text }}</small>
+                {% endif %}
+
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="save-button">
+                    Save Workflow
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

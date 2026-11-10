@@ -1,0 +1,175 @@
+{% extends "campaigns/base.html" %}
+
+{% block page_title %}Campaign Status{% endblock %}
+
+{% block content %}
+
+<style>
+.success-container {
+    min-height: 75vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.success-card {
+    width: 100%;
+    max-width: 650px;
+    padding: 35px;
+    background: white;
+    border: 1px solid lightgray;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 4px 15px lightgray;
+}
+
+.success-icon {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: honeydew;
+    color: darkgreen;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 38px;
+}
+
+.success-card h2 {
+    color: midnightblue;
+    font-size: 25px;
+    margin-bottom: 12px;
+}
+
+.success-description {
+    color: slategray;
+    margin-bottom: 25px;
+}
+
+.campaign-info {
+    background: aliceblue;
+    border: 1px solid lightblue;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+    margin-bottom: 22px;
+}
+
+.campaign-info p {
+    color: slategray;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.campaign-info h3 {
+    color: midnightblue;
+    font-size: 17px;
+    margin-bottom: 15px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 22px 0;
+}
+
+.stat-box {
+    padding: 18px 10px;
+    border: 1px solid lightgray;
+    border-radius: 9px;
+    background: white;
+}
+
+.stat-box h3 {
+    font-size: 25px;
+    color: midnightblue;
+}
+
+.stat-box p {
+    font-size: 12px;
+    color: slategray;
+}
+
+.success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.logs-button {
+    background: slategray;
+    border-color: slategray;
+}
+
+@media(max-width: 500px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="success-container">
+    <div class="success-card">
+
+        <div class="success-icon">✓</div>
+
+        {% if failed_count == 0 %}
+            <h2>Emails Sent Successfully!</h2>
+            <p class="success-description">
+                Your email campaign has been processed successfully.
+            </p>
+        {% else %}
+            <h2>Campaign Processing Completed</h2>
+            <p class="success-description">
+                Your campaign has been processed. Please review the delivery summary below.
+            </p>
+        {% endif %}
+
+        <div class="campaign-info">
+            <p>Campaign Name</p>
+            <h3>{{ campaign.name }}</h3>
+
+            <p>Email Subject</p>
+            <h3>{{ campaign.subject }}</h3>
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+                <h3>{{ total_count }}</h3>
+                <p>Total Recipients</p>
+            </div>
+
+            <div class="stat-box">
+                <h3>{{ sent_count }}</h3>
+                <p>Successfully Sent</p>
+            </div>
+
+            <div class="stat-box">
+                <h3>{{ failed_count }}</h3>
+                <p>Failed Emails</p>
+            </div>
+
+        </div>
+
+        <div class="success-actions">
+
+            <a href="{% url 'campaign_list' %}" class="button">
+                Back to Campaigns
+            </a>
+
+            <a href="{% url 'email_logs' %}" class="button logs-button">
+                View Email Logs
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
